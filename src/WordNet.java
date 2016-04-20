@@ -1,5 +1,7 @@
 import edu.princeton.cs.algs4.Digraph;
+import edu.princeton.cs.algs4.DirectedCycle;
 import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.Topological;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +13,9 @@ public class WordNet {
     private ArrayList<ArrayList<String>> synArray = new ArrayList<>();
     private HashMap<String, ArrayList<Integer>> nouns = new HashMap<>();
     private SAP sap;
+    private DirectedCycle finder;
+    private Topological topological;
+
 
     public WordNet(String synsets, String hypernyms) {
         In inS = new In(synsets);
@@ -43,6 +48,16 @@ public class WordNet {
             }
         }
 
+        finder = new DirectedCycle(digraph);
+        topological = new Topological(digraph);
+
+        if (finder.hasCycle())
+            throw new java.lang.IllegalArgumentException("cycle");
+
+        if (!topological.hasOrder()) {
+            throw new java.lang.IllegalArgumentException("multi root");
+        }
+
         sap = new SAP(digraph);
     }
 
@@ -65,8 +80,8 @@ public class WordNet {
         ArrayList<Integer> nB = nouns.get(nounB);
         int ancestor = sap.ancestor(nA, nB);
         StringBuilder sb = new StringBuilder();
-        for (String s : synArray.get(ancestor)) {
-            sb.append(s + " ");
+        for (int i = 0; i < synArray.get(ancestor).size()-1; i++) {
+            sb.append(synArray.get(ancestor).get(i) + " ");
         }
         return sb.toString();
     }
