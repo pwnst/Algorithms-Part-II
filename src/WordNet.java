@@ -64,7 +64,7 @@ public class WordNet {
     public Iterable<String> nouns() {
         return nouns.keySet();
     }
-
+1
     public boolean isNoun(String word) {
         return nouns.containsKey(word);
     }
