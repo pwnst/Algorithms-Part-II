@@ -6,23 +6,32 @@ import java.util.ArrayList;
 
 
 public class SAP {
-    private Digraph digraph;
-    private int anc;
-    private int dist;
+    private final Digraph digraph;
 
     public SAP(Digraph G) {
-        digraph = G;
+        digraph = new Digraph(G);
     }
 
-    private void calcAll(int v, int w) {
+    private int[] calcAll(int v, int w) {
         ArrayList<Integer> va = new ArrayList<>();
         ArrayList<Integer> wa = new ArrayList<>();
         va.add(v);
         wa.add(w);
-        calcAll(va, wa);
+        return calcAll(va, wa);
     }
 
-    private void calcAll(Iterable<Integer> v, Iterable<Integer> w) {
+    private int[] calcAll(Iterable<Integer> v, Iterable<Integer> w) {
+        if (v == null || w == null)
+            throw new java.lang.NullPointerException();
+        for (int vv: v) {
+            validateV(vv);
+        }
+        for (int ww: w) {
+            validateV(ww);
+        }
+
+        int[] results = new int[2];
+
         BreadthFirstDirectedPaths bfsV = new BreadthFirstDirectedPaths(digraph, v);
         BreadthFirstDirectedPaths bfsW = new BreadthFirstDirectedPaths(digraph, w);
 
@@ -40,33 +49,35 @@ public class SAP {
             }
         }
         if (minDistance == Integer.MAX_VALUE) {
-            dist = -1;
-            anc = -1;
+            results[0] = -1;
+            results[1] = -1;
+            return results;
         } else {
-            dist = minDistance;
-            anc = vertex;
+            results[0] = minDistance;
+            results[1] = vertex;
+            return results;
         }
-
     }
 
     public int length(int v, int w) {
-        calcAll(v, w);
-        return dist;
+        return calcAll(v, w)[0];
     }
 
     public int ancestor(int v, int w) {
-        calcAll(v, w);
-        return anc;
+        return calcAll(v, w)[1];
     }
 
     public int length(Iterable<Integer> v, Iterable<Integer> w) {
-        calcAll(v, w);
-        return dist;
+        return calcAll(v, w)[0];
     }
 
     public int ancestor(Iterable<Integer> v, Iterable<Integer> w) {
-        calcAll(v, w);
-        return anc;
+        return calcAll(v, w)[1];
+    }
+
+    private void validateV(int v) {
+        if (v < 0 || v >= digraph.V())
+            throw new IndexOutOfBoundsException("vertex is not in bounds");
     }
 
     public static void main(String[] args) {

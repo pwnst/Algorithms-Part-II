@@ -8,7 +8,7 @@ public class Outcast {
     }
 
     public String outcast(String[] nouns) {
-        String blacksheep = null;
+        String blackSheep = null;
         int distance = 0;
         for (String n : nouns) {
             int currentDist = 0;
@@ -20,10 +20,10 @@ public class Outcast {
             }
             if (currentDist > distance) {
                 distance = currentDist;
-                blacksheep = currentNoun;
+                blackSheep = currentNoun;
             }
         }
-        return blacksheep;
+        return blackSheep;
     }
 
     public static void main(String[] args) {

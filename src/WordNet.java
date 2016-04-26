@@ -40,21 +40,28 @@ public class WordNet {
         }
 
         digraph = new Digraph(synArray.size());
+        boolean[] pointToOther = new boolean[digraph.V()];
 
         while (inH.hasNextLine()) {
             String[] lineData = inH.readLine().split(",");
+            pointToOther[Integer.parseInt(lineData[0])] = true;
             for (int i = 1; i < lineData.length; i++) {
                 digraph.addEdge(Integer.parseInt(lineData[0]), Integer.parseInt(lineData[i]));
             }
         }
 
         finder = new DirectedCycle(digraph);
-        topological = new Topological(digraph);
 
-        if (finder.hasCycle())
+        if (finder.hasCycle()) {
             throw new java.lang.IllegalArgumentException("cycle");
+        }
 
-        if (!topological.hasOrder()) {
+        int count = 0;
+        for (boolean bool : pointToOther) {
+            if (!bool) count++;
+        }
+
+        if (count > 1) {
             throw new java.lang.IllegalArgumentException("multi root");
         }
 
@@ -66,16 +73,22 @@ public class WordNet {
     }
 1
     public boolean isNoun(String word) {
+        if (word == null)
+            throw new java.lang.NullPointerException();
         return nouns.containsKey(word);
     }
 
     public int distance(String nounA, String nounB) {
+        checkNoun(nounA);
+        checkNoun(nounB);
         ArrayList<Integer> nA = nouns.get(nounA);
         ArrayList<Integer> nB = nouns.get(nounB);
         return sap.length(nA, nB);
     }
 
     public String sap(String nounA, String nounB) {
+        checkNoun(nounA);
+        checkNoun(nounB);
         ArrayList<Integer> nA = nouns.get(nounA);
         ArrayList<Integer> nB = nouns.get(nounB);
         int ancestor = sap.ancestor(nA, nB);
@@ -84,6 +97,15 @@ public class WordNet {
             sb.append(synArray.get(ancestor).get(i) + " ");
         }
         return sb.toString();
+    }
+
+    private void checkNoun(String noun) {
+        if (noun == null) {
+            throw new NullPointerException();
+        }
+        if (!isNoun(noun)) {
+            throw new IllegalArgumentException();
+        }
     }
 
     public static void main(String[] args) {
